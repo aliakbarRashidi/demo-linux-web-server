@@ -12,6 +12,8 @@
 
 #include <string>
 
+#include "socket.hpp"
+
 namespace demo_web_server
 {
 
@@ -33,6 +35,10 @@ public:
      * Start the server event loop.
      */
     void serve();
+
+private:
+    Socket m_socket;
+    std::string m_basedir;
 };
 
 } // namespace demo_web_server

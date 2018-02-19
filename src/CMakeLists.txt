@@ -10,7 +10,10 @@ cmake_minimum_required(VERSION 3.2)
 
 add_executable(demo-web-server
     demo_web_server.cpp
+    addrinfo.cpp
     logging.hpp
+    socket.cpp
+    utils.cpp
     web_server.cpp
 )
 
