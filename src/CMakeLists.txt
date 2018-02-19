@@ -10,6 +10,8 @@ cmake_minimum_required(VERSION 3.2)
 
 add_executable(demo-web-server
     demo_web_server.cpp
+    logging.hpp
+    web_server.cpp
 )
 
 configure_file(version.hpp.in version.hpp @ONLY)
