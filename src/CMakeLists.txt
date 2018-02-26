@@ -12,6 +12,7 @@ add_executable(demo-web-server
     demo_web_server.cpp
     addrinfo.cpp
     file.cpp
+    http.cpp
     logging.hpp
     socket.cpp
     thread.hpp
