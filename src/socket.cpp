@@ -35,6 +35,11 @@ Socket::Socket(int domain, int type, int protocol)
     }
 }
 
+Socket::Socket(int fd)
+  : m_fd(fd)
+{
+}
+
 Socket::Socket(Socket&& other)
 {
     m_fd = other.m_fd;
@@ -66,6 +71,19 @@ Socket::~Socket()
     }
 }
 
+Socket Socket::accept()
+{
+    int new_fd = ::accept(m_fd, nullptr, nullptr);
+
+    if (new_fd < 0)
+    {
+        throw std::system_error(errno, std::generic_category(),
+            "failed to accept a connection");
+    }
+
+    return Socket(new_fd);
+}
+
 void Socket::bind(const sockaddr *addr, socklen_t len)
 {
     if (::bind(m_fd, addr, len))
@@ -73,6 +91,43 @@ void Socket::bind(const sockaddr *addr, socklen_t len)
         throw std::system_error(errno, std::generic_category(),
             "failed to bind a socket");
     }
+}
+
+void Socket::listen(int backlog)
+{
+    if (::listen(m_fd, backlog))
+    {
+        throw std::system_error(errno, std::generic_category(),
+            "failed to listen to a socket");
+    }
+}
+
+void Socket::shutdown()
+{
+    if (::shutdown(m_fd, SHUT_RDWR))
+    {
+        throw std::system_error(errno, std::generic_category(),
+            "failed to close the connection");
+    }
+}
+
+static std::string print_sockaddr(const struct sockaddr_storage &addr, socklen_t len)
+{
+    char host[NI_MAXHOST];
+    char port[NI_MAXSERV];
+    int err = ::getnameinfo(reinterpret_cast<const struct sockaddr*>(&addr), len,
+                            host, sizeof(host), port, sizeof(port), 0);
+
+    if (err)
+    {
+        throw std::runtime_error(std::string("failed to get socket name: ") + gai_strerror(err));
+    }
+
+    std::string result;
+    result += host;
+    result += ":";
+    result += port;
+    return result;
 }
 
 std::string Socket::getsockname() const
@@ -86,21 +141,21 @@ std::string Socket::getsockname() const
             "failed to get socket name");
     }
 
-    char host[NI_MAXHOST];
-    char port[NI_MAXSERV];
-    int err = ::getnameinfo(reinterpret_cast<struct sockaddr*>(&addr), len,
-                            host, sizeof(host), port, sizeof(port), 0);
+    return print_sockaddr(addr, len);
+}
 
-    if (err)
+std::string Socket::getpeername() const
+{
+    struct sockaddr_storage addr;
+    socklen_t len = sizeof(addr);
+
+    if (::getpeername(m_fd, reinterpret_cast<struct sockaddr*>(&addr), &len) < 0)
     {
-        throw std::runtime_error(std::string("failed to get socket name: ") + gai_strerror(err));
+        throw std::system_error(errno, std::generic_category(),
+            "failed to get socket peer name");
     }
 
-    std::string result;
-    result += host;
-    result += ":";
-    result += port;
-    return result;
+    return print_sockaddr(addr, len);
 }
 
 } // namespace demo_web_server

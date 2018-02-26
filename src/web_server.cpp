@@ -16,6 +16,9 @@
 #include "logging.hpp"
 #include "utils.hpp"
 
+/// Maximum number of pending unaccepted connections.
+static const int kDefaultConnectionBacklog = 10;
+
 namespace demo_web_server
 {
 
@@ -56,11 +59,21 @@ WebServer::WebServer(const std::string &address, const std::string &basedir)
   : m_socket(bind_server_address(address))
   , m_basedir(basedir)
 {
-    LOG_NOTICE << "listening on " << m_socket.getsockname() << "\n";
+    LOG_NOTICE << "listening on " << m_socket.getsockname() << std::endl;
+
+    m_socket.listen(kDefaultConnectionBacklog);
 }
 
 void WebServer::serve()
 {
+    while (true)
+    {
+        auto connection = m_socket.accept();
+
+        LOG_DEBUG << "accepted a new connection from " << connection.getpeername() << std::endl;
+
+        connection.shutdown();
+    }
 }
 
 } // namespace demo_web_server

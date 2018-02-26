@@ -45,14 +45,40 @@ public:
     ~Socket();
 
     /**
+     * Accept a new connection on this socket.
+     */
+    Socket accept();
+
+    /**
      * Bind an address to the socket.
      */
     void bind(const struct sockaddr *addr, socklen_t len);
 
     /**
+     * Switch the socket into listening mode.
+     */
+    void listen(int backlog);
+
+    /**
+     * Close the connection gracefully.
+     */
+    void shutdown();
+
+    /**
      * Get address bound to the socket (as string).
      */
     std::string getsockname() const;
+
+    /**
+     * Get address of the remote peer (as string).
+     */
+    std::string getpeername() const;
+
+private:
+    /**
+     * Wrap an existing file descriptor.
+     */
+    explicit Socket(int fd);
 
 private:
     int m_fd;
