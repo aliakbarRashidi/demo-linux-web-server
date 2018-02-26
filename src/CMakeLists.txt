@@ -13,9 +13,13 @@ add_executable(demo-web-server
     addrinfo.cpp
     logging.hpp
     socket.cpp
+    thread.hpp
     utils.cpp
     web_server.cpp
 )
 
 configure_file(version.hpp.in version.hpp @ONLY)
 target_include_directories(demo-web-server PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+
+find_package(Threads)
+target_link_libraries(demo-web-server ${CMAKE_THREAD_LIBS_INIT})

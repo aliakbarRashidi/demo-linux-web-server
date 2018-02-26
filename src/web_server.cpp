@@ -10,10 +10,12 @@
 
 #include "web_server.hpp"
 
+#include <memory>
 #include <system_error>
 
 #include "addrinfo.hpp"
 #include "logging.hpp"
+#include "thread.hpp"
 #include "utils.hpp"
 
 /// Maximum number of pending unaccepted connections.
@@ -72,7 +74,12 @@ void WebServer::serve()
 
         LOG_DEBUG << "accepted a new connection from " << connection.getpeername() << std::endl;
 
-        connection.shutdown();
+        Thread thread(std::bind([](Socket &connection)
+        {
+            connection.shutdown();
+        }, std::move(connection)));
+
+        thread.detach();
     }
 }
 
