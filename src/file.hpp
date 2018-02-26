@@ -15,6 +15,8 @@
 namespace demo_web_server
 {
 
+class Socket;
+
 class File
 {
 public:
@@ -25,6 +27,8 @@ public:
     size_t size() const;
 
 private:
+    friend class Socket;
+
     int m_fd;
 };
 

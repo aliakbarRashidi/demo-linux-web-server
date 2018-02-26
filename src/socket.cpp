@@ -13,12 +13,16 @@
 #include <errno.h>
 #include <netdb.h>
 #include <sys/types.h>
+#include <sys/sendfile.h>
 #include <sys/socket.h>
 #include <unistd.h>
 
 #include <system_error>
 
+#include "file.hpp"
 #include "logging.hpp"
+
+static const size_t kMaxRequestSize = 4096;
 
 namespace demo_web_server
 {
@@ -156,6 +160,59 @@ std::string Socket::getpeername() const
     }
 
     return print_sockaddr(addr, len);
+}
+
+std::string Socket::read()
+{
+    char buffer[kMaxRequestSize];
+
+    ssize_t read_bytes = ::read(m_fd, buffer, sizeof(buffer));
+
+    if (read_bytes < 0)
+    {
+        throw std::system_error(errno, std::generic_category(),
+            "failed to read from a socket");
+    }
+
+    return std::string(buffer, static_cast<size_t>(read_bytes));
+}
+
+void Socket::write(const std::string &message)
+{
+    const char *data = message.data();
+    size_t left = message.length();
+
+    while (left > 0)
+    {
+        ssize_t wrote_bytes = ::write(m_fd, data, left);
+
+        if (wrote_bytes < 0)
+        {
+            throw std::system_error(errno, std::generic_category(),
+                "failed to write to a socket");
+        }
+
+        data += static_cast<size_t>(wrote_bytes);
+        left -= static_cast<size_t>(wrote_bytes);
+    }
+}
+
+void Socket::sendfile(File &file, size_t size)
+{
+    size_t left = size;
+
+    while (left > 0)
+    {
+        ssize_t sent_bytes = ::sendfile(m_fd, file.m_fd, nullptr, left);
+
+        if (sent_bytes < 0)
+        {
+            throw std::system_error(errno, std::generic_category(),
+                "failed to send a file");
+        }
+
+        left -= sent_bytes;
+    }
 }
 
 } // namespace demo_web_server

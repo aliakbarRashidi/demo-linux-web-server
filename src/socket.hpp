@@ -18,6 +18,8 @@
 namespace demo_web_server
 {
 
+class File;
+
 /**
  * RAII wrapper over raw socket descriptors.
  */
@@ -73,6 +75,18 @@ public:
      * Get address of the remote peer (as string).
      */
     std::string getpeername() const;
+
+    /**
+     * Read data from the socket.
+     */
+    std::string read();
+
+    /**
+     * Write data into the socket.
+     */
+    void write(const std::string &message);
+
+    void sendfile(File &file, size_t size);
 
 private:
     /**
