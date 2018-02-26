@@ -14,12 +14,16 @@
 #include <system_error>
 
 #include "addrinfo.hpp"
+#include "file.hpp"
+#include "http.hpp"
 #include "logging.hpp"
 #include "thread.hpp"
 #include "utils.hpp"
 
 /// Maximum number of pending unaccepted connections.
 static const int kDefaultConnectionBacklog = 10;
+
+static const std::string kDefaultPath = "/index.html";
 
 namespace demo_web_server
 {
@@ -74,10 +78,43 @@ void WebServer::serve()
 
         LOG_DEBUG << "accepted a new connection from " << connection.getpeername() << std::endl;
 
-        Thread thread(std::bind([](Socket &connection)
+        Thread thread(std::bind([](Socket &connection, std::string basedir)
         {
+            try
+            {
+                auto request = connection.read();
+                auto request_path = get_request_path(request);
+                auto full_path = basedir + ((request_path == "/") ? kDefaultPath : request_path);
+
+                LOG_DEBUG << "sending \"" << full_path << "\"" << std::endl;
+
+                try
+                {
+                    File file(full_path);
+                    auto size = file.size();
+
+                    connection.write(success_header_200("text/plain", size));
+                    connection.sendfile(file, size);
+                }
+                catch (const std::system_error &e)
+                {
+                    if (e.code().value() == ENOENT)
+                    {
+                        connection.write(error_message_404(request_path));
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+            catch (const std::exception &e)
+            {
+                connection.write(error_message_500(e.what()));
+            }
+
             connection.shutdown();
-        }, std::move(connection)));
+        }, std::move(connection), m_basedir));
 
         thread.detach();
     }
