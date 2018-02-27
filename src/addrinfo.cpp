@@ -12,19 +12,6 @@
 
 #include <stdexcept>
 
-namespace demo_web_server
-{
-
-AddrInfo::AddrInfo(struct addrinfo *info)
-  : m_info(info)
-{
-}
-
-AddrInfo::~AddrInfo()
-{
-    freeaddrinfo(m_info);
-}
-
 AddrInfo getaddrinfo(const std::string &name, const std::string &service)
 {
     struct addrinfo hints;
@@ -46,4 +33,30 @@ AddrInfo getaddrinfo(const std::string &name, const std::string &service)
     return AddrInfo(result);
 }
 
-} // namespace demo_web_server
+AddrInfo::AddrInfo(struct addrinfo *info)
+  : m_info(info)
+{
+}
+
+AddrInfo::~AddrInfo()
+{
+    freeaddrinfo(m_info);
+}
+
+AddrInfo::AddrInfo(AddrInfo &&other)
+{
+    m_info = other.m_info;
+    other.m_info = nullptr;
+}
+
+AddrInfo& AddrInfo::operator=(AddrInfo &&other)
+{
+    if (this != &other)
+    {
+        freeaddrinfo(m_info);
+
+        m_info = other.m_info;
+        other.m_info = nullptr;
+    }
+    return *this;
+}

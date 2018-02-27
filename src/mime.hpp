@@ -12,9 +12,4 @@
 
 #include <string>
 
-namespace demo_web_server
-{
-
 std::string file_mime_type(const std::string &path);
-
-} // namespace demo_web_server

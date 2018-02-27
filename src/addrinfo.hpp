@@ -16,17 +16,15 @@
 
 #include <string>
 
-namespace demo_web_server
-{
-
-/**
- * RAII wrapper over `struct addrinfo`.
- */
 class AddrInfo
 {
 public:
     explicit AddrInfo(struct addrinfo *info);
+
     ~AddrInfo();
+
+    AddrInfo(AddrInfo &&other);
+    AddrInfo& operator=(AddrInfo &&other);
 
     operator const struct addrinfo*() const
     {
@@ -38,5 +36,3 @@ private:
 };
 
 AddrInfo getaddrinfo(const std::string &name, const std::string &service);
-
-} // namespace demo_web_server

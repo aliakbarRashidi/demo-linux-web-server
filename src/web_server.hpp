@@ -14,31 +14,14 @@
 
 #include "socket.hpp"
 
-namespace demo_web_server
-{
-
-/**
- * Main web server loop.
- */
 class WebServer
 {
 public:
-    /**
-     * Make a new web server.
-     *
-     * @param address   address to listen to
-     * @param basedir   base directory to serve files from
-     */
     explicit WebServer(const std::string &address, const std::string &basedir);
 
-    /**
-     * Start the server event loop.
-     */
     void serve();
 
 private:
     Socket m_socket;
     std::string m_basedir;
 };
-
-} // namespace demo_web_server

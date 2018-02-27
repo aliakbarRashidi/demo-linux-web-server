@@ -13,11 +13,6 @@
 #include <regex>
 #include <stdexcept>
 
-#include "logging.hpp"
-
-namespace demo_web_server
-{
-
 std::string get_request_path(const std::string &request)
 {
     std::regex get_request("^GET (/[^ ]*) ", std::regex_constants::icase);
@@ -92,5 +87,3 @@ std::string error_message_500(const std::string &error_text)
 
     return error_message("500 Internal Server Error", message);
 }
-
-} // namespace demo_web_server

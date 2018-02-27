@@ -12,14 +12,9 @@
 
 #include <string>
 
-namespace demo_web_server
-{
-
 std::string get_request_path(const std::string &request);
 
 std::string success_header_200(const std::string &mime, size_t size);
 
 std::string error_message_404(const std::string &path);
 std::string error_message_500(const std::string &error_text);
-
-} // namespace demo_web_server

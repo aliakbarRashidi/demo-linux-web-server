@@ -15,12 +15,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+#include <iostream>
 #include <system_error>
-
-#include "logging.hpp"
-
-namespace demo_web_server
-{
 
 File::File(const std::string &path)
   : m_fd(-1)
@@ -38,9 +34,9 @@ File::~File()
 {
     if (::close(m_fd) < 0)
     {
-        LOG_WARNING << "failed to close a file: "
-                    << std::error_code(errno, std::generic_category()).message()
-                    << std::endl;
+        std::cerr << "failed to close a file: "
+                  << std::error_code(errno, std::generic_category()).message()
+                  << std::endl;
     }
 }
 
@@ -54,7 +50,5 @@ size_t File::size() const
             "failed to stat a file");
     }
 
-    return buf.st_size;
+    return static_cast<size_t>(buf.st_size);
 }
-
-} // namespace demo_web_server

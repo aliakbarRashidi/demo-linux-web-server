@@ -10,24 +10,41 @@
 
 #include "web_server.hpp"
 
+#include <iostream>
 #include <memory>
 #include <system_error>
 
 #include "addrinfo.hpp"
 #include "file.hpp"
 #include "http.hpp"
-#include "logging.hpp"
 #include "mime.hpp"
 #include "thread.hpp"
-#include "utils.hpp"
 
 /// Maximum number of pending unaccepted connections.
 static const int kDefaultConnectionBacklog = 10;
 
 static const std::string kDefaultPath = "/index.html";
 
-namespace demo_web_server
+static void parse_address_string(const std::string &address, std::string &host, std::string &port)
 {
+    if (address.empty())
+    {
+        throw std::runtime_error("empty address string");
+    }
+
+    auto port_index = address.rfind(':');
+
+    if (port_index == std::string::npos)
+    {
+        host = "";
+        port = address;
+    }
+    else
+    {
+        host = address.substr(0, port_index);
+        port = address.substr(port_index + 1);
+    }
+}
 
 static Socket bind_server_address(const std::string &address)
 {
@@ -66,7 +83,7 @@ WebServer::WebServer(const std::string &address, const std::string &basedir)
   : m_socket(bind_server_address(address))
   , m_basedir(basedir)
 {
-    LOG_NOTICE << "listening on " << m_socket.getsockname() << std::endl;
+    std::cout << "listening on " << m_socket.getsockname() << std::endl;
 
     m_socket.listen(kDefaultConnectionBacklog);
 }
@@ -77,7 +94,7 @@ void WebServer::serve()
     {
         auto connection = m_socket.accept();
 
-        LOG_DEBUG << "accepted a new connection from " << connection.getpeername() << std::endl;
+        std::cout << "accepted a new connection from " << connection.getpeername() << std::endl;
 
         Thread thread(std::bind([](Socket &connection, std::string basedir)
         {
@@ -88,7 +105,7 @@ void WebServer::serve()
                 auto full_path = basedir + ((request_path == "/") ? kDefaultPath : request_path);
                 auto mime_type = file_mime_type(full_path);
 
-                LOG_DEBUG << "sending " << mime_type << " \"" << full_path << "\"" << std::endl;
+                std::cout << "sending " << mime_type << " \"" << full_path << "\"" << std::endl;
 
                 try
                 {
@@ -121,5 +138,3 @@ void WebServer::serve()
         thread.detach();
     }
 }
-
-} // namespace demo_web_server

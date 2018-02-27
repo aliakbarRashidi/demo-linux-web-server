@@ -12,9 +12,6 @@
 
 #include <string>
 
-namespace demo_web_server
-{
-
 class Socket;
 
 class File
@@ -31,5 +28,3 @@ private:
 
     int m_fd;
 };
-
-} // namespace demo_web_server

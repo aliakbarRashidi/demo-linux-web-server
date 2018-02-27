@@ -14,9 +14,6 @@
 
 #include <magic.h>
 
-namespace demo_web_server
-{
-
 class Magic
 {
 public:
@@ -65,5 +62,3 @@ std::string file_mime_type(const std::string &path)
 
     return mime_type;
 }
-
-} // namespace demo_web_server

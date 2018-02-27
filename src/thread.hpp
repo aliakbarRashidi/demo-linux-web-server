@@ -10,28 +10,18 @@
 
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <system_error>
 
 #include <pthread.h>
 
-#include "logging.hpp"
-
-namespace demo_web_server
-{
-
-/**
- * A thread of execution.
- */
 class Thread
 {
     pthread_t m_thread;
     bool m_detached;
 
 public:
-    /**
-     * Create and launch a thread executing a provided function.
-     */
     template <class F>
     explicit Thread(F &&f)
       : m_thread(0)
@@ -50,22 +40,14 @@ public:
         function.release();
     }
 
-    /**
-     * Destroy a thread.
-     *
-     * You may not destroy threads which were not joined or detached.
-     */
     ~Thread()
     {
         if (!m_detached)
         {
-            LOG_WARNING << "destroying a non-detached a thread" << std::endl;
+            std::cerr << "destroying a non-detached a thread" << std::endl;
         }
     }
 
-    /**
-     * Detach the thread.
-     */
     void detach()
     {
         int error = ::pthread_detach(m_thread);
@@ -90,5 +72,3 @@ private:
         return nullptr;
     }
 };
-
-} // namespace demo_web_server

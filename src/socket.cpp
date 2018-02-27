@@ -17,15 +17,12 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <iostream>
 #include <system_error>
 
 #include "file.hpp"
-#include "logging.hpp"
 
 static const size_t kMaxRequestSize = 4096;
-
-namespace demo_web_server
-{
 
 Socket::Socket(int domain, int type, int protocol)
   : m_fd(-1)
@@ -69,9 +66,9 @@ Socket::~Socket()
 
     if (::close(m_fd) < 0)
     {
-        LOG_WARNING << "failed to close a socket: "
-                    << std::error_code(errno, std::generic_category()).message()
-                    << "\n";
+        std::cerr << "failed to close a socket: "
+                  << std::error_code(errno, std::generic_category()).message()
+                  << "\n";
     }
 }
 
@@ -214,5 +211,3 @@ void Socket::sendfile(File &file, size_t size)
         left -= sent_bytes;
     }
 }
-
-} // namespace demo_web_server

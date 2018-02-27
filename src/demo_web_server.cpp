@@ -12,11 +12,8 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "logging.hpp"
 #include "web_server.hpp"
 #include "version.hpp"
-
-using namespace demo_web_server;
 
 static const struct option long_options[] = {
     { "help",       0, nullptr, 'h' },
@@ -95,13 +92,13 @@ int main(int argc, char *argv[])
         }
         catch (const std::exception &e)
         {
-            LOG_CRITICAL << "fatal error: " << e.what() << "\n";
+            std::cerr << "fatal error: " << e.what() << "\n";
             return 3;
         }
     }
     catch (const std::exception &e)
     {
-        LOG_CRITICAL << "fatal startup error: " << e.what() << "\n";
+        std::cerr << "fatal startup error: " << e.what() << "\n";
         return 2;
     }
 }
