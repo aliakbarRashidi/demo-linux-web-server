@@ -14,6 +14,7 @@ add_executable(demo-web-server
     file.cpp
     http.cpp
     logging.hpp
+    mime.cpp
     socket.cpp
     thread.hpp
     utils.cpp

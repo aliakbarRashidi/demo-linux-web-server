@@ -17,6 +17,7 @@
 #include "file.hpp"
 #include "http.hpp"
 #include "logging.hpp"
+#include "mime.hpp"
 #include "thread.hpp"
 #include "utils.hpp"
 
@@ -85,15 +86,16 @@ void WebServer::serve()
                 auto request = connection.read();
                 auto request_path = get_request_path(request);
                 auto full_path = basedir + ((request_path == "/") ? kDefaultPath : request_path);
+                auto mime_type = file_mime_type(full_path);
 
-                LOG_DEBUG << "sending \"" << full_path << "\"" << std::endl;
+                LOG_DEBUG << "sending " << mime_type << " \"" << full_path << "\"" << std::endl;
 
                 try
                 {
                     File file(full_path);
                     auto size = file.size();
 
-                    connection.write(success_header_200("text/plain", size));
+                    connection.write(success_header_200(mime_type, size));
                     connection.sendfile(file, size);
                 }
                 catch (const std::system_error &e)
