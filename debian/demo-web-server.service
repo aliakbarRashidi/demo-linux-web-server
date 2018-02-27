@@ -1,0 +1,9 @@
+[Unit]
+Description=demo web server
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/demo-web-server
+
+[Install]
+WantedBy=multi-user.target
