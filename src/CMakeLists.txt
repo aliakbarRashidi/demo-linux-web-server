@@ -23,5 +23,9 @@ add_executable(demo-web-server
 configure_file(version.hpp.in version.hpp @ONLY)
 target_include_directories(demo-web-server PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
-find_package(Threads)
+find_package(Threads REQUIRED)
 target_link_libraries(demo-web-server ${CMAKE_THREAD_LIBS_INIT})
+
+find_package(LibMagic REQUIRED)
+target_include_directories(demo-web-server PUBLIC ${LIBMAGIC_INCLUDE_DIRS})
+target_link_libraries(demo-web-server ${LIBMAGIC_LIBRARIES})
