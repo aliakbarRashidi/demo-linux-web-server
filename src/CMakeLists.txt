@@ -19,6 +19,8 @@ add_executable(demo-web-server
     web_server.cpp
 )
 
+install(TARGETS demo-web-server RUNTIME DESTINATION bin)
+
 configure_file(version.hpp.in version.hpp @ONLY)
 target_include_directories(demo-web-server PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
