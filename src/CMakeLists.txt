@@ -14,6 +14,7 @@ add_executable(demo-web-server
     file.cpp
     http.cpp
     mime.cpp
+    signal.cpp
     socket.cpp
     thread.hpp
     web_server.cpp

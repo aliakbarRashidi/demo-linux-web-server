@@ -18,6 +18,7 @@
 #include "file.hpp"
 #include "http.hpp"
 #include "mime.hpp"
+#include "signal.hpp"
 #include "thread.hpp"
 
 /// Maximum number of pending unaccepted connections.
@@ -90,51 +91,66 @@ WebServer::WebServer(const std::string &address, const std::string &basedir)
 
 void WebServer::serve()
 {
-    while (true)
+    try
     {
-        auto connection = m_socket.accept();
-
-        std::cout << "accepted a new connection from " << connection.getpeername() << std::endl;
-
-        Thread thread(std::bind([](Socket &connection, std::string basedir)
+        while (!termination_signal_received())
         {
+            serve_one_connection();
+        }
+    }
+    catch (const std::system_error &e)
+    {
+        if (e.code().value() != EINTR)
+        {
+            throw;
+        }
+    }
+}
+
+void WebServer::serve_one_connection()
+{
+    auto connection = m_socket.accept();
+
+    std::cout << "accepted a new connection from " << connection.getpeername() << std::endl;
+
+    Thread thread(std::bind([](Socket &connection, std::string basedir)
+    {
+        try
+        {
+            auto request = connection.read();
+            auto request_path = get_request_path(request);
+            auto full_path = basedir + ((request_path == "/") ? kDefaultPath : request_path);
+            auto mime_type = file_mime_type(full_path);
+
+            std::cout << "sending " << mime_type << " \"" << full_path << "\"" << std::endl;
+
             try
             {
-                auto request = connection.read();
-                auto request_path = get_request_path(request);
-                auto full_path = basedir + ((request_path == "/") ? kDefaultPath : request_path);
-                auto mime_type = file_mime_type(full_path);
+                File file(full_path);
+                auto size = file.size();
 
-                std::cout << "sending " << mime_type << " \"" << full_path << "\"" << std::endl;
-
-                try
-                {
-                    File file(full_path);
-                    auto size = file.size();
-
-                    connection.write(success_header_200(mime_type, size));
-                    connection.sendfile(file, size);
-                }
-                catch (const std::system_error &e)
-                {
-                    if (e.code().value() == ENOENT)
-                    {
-                        connection.write(error_message_404(request_path));
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                connection.write(success_header_200(mime_type, size));
+                connection.sendfile(file, size);
             }
-            catch (const std::exception &e)
+            catch (const std::system_error &e)
             {
-                connection.write(error_message_500(e.what()));
+                if (e.code().value() == ENOENT)
+                {
+                    connection.write(error_message_404(request_path));
+                }
+                else
+                {
+                    throw;
+                }
             }
+        }
+        catch (const std::exception &e)
+        {
+            connection.write(error_message_500(e.what()));
+        }
 
-            connection.shutdown();
-        }, std::move(connection), m_basedir));
+        connection.shutdown();
+    }, std::move(connection), m_basedir));
 
-        thread.detach();
-    }
+    thread.detach();
 }

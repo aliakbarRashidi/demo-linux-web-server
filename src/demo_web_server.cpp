@@ -12,6 +12,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "signal.hpp"
 #include "web_server.hpp"
 #include "version.hpp"
 
@@ -84,6 +85,8 @@ int main(int argc, char *argv[])
 
     try
     {
+        install_signal_handlers();
+
         WebServer server(listen_address, www_directory);
 
         try

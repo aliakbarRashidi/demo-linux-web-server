@@ -10,21 +10,6 @@
 
 #pragma once
 
-#include <string>
+void install_signal_handlers();
 
-#include "socket.hpp"
-
-class WebServer
-{
-public:
-    explicit WebServer(const std::string &address, const std::string &basedir);
-
-    void serve();
-
-private:
-    void serve_one_connection();
-
-private:
-    Socket m_socket;
-    std::string m_basedir;
-};
+bool termination_signal_received();
