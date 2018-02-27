@@ -1,0 +1,59 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2018 Apriorit, Inc.
+.\"
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH DEMO-WEB-SERVER 1 "February 27 2018"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+demo-web-server \- a simple web server
+.SH SYNOPSIS
+.B demo-web-server
+.RI [ "--listen <address:port>" ]
+.RI [ "<www-directory>" ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B demo-web-server
+command line.
+.PP
+.B demo-web-server
+is a simple web server
+demonstrating Linux APIs for networking and threading
+as well as packaging of native binaries for Debian.
+.SH OPTIONS
+The program follows the usual GNU command line syntax,
+with long and short options starting with dashes.
+A summary of all options is provided below.
+.TP
+.B \-h, \-\-help
+Show summary of options and immediately exit.
+.TP
+.B \-v, \-\-version
+Show version of program and immediately exit.
+.TP
+.B \-a, \-\-listen
+Set the address and port to listen to.
+The format is "address:port".
+The address may be omitted, then we'll listen to all interfaces.
+
+If the option is omitted the web server will listen
+on all IPv6-enabled interfaces on port 80 (equal to ":::80").
+.TP
+.B www-directory
+Set the directory to host files from.
+Only one base directory may be set.
+
+This option may be omitted,
+in this case the server defaults to "/var/www".

@@ -1,0 +1,6 @@
+The Debian Package demo-web-server
+----------------------------
+
+A simple web server demonstrating Linux APIs for networking and threading.
+
+ -- Alexei Lozovsky <lozovsky@apriorit.com>  Tue, 27 Feb 2018 21:19:27 +0200

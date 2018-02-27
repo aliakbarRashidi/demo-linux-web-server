@@ -1,0 +1,5 @@
+demo-web-server (0.1.0) unstable; urgency=medium
+
+  * Initial release of the basic web server.
+
+ -- Alexei Lozovsky <lozovsky@apriorit.com>  Tue, 27 Feb 2018 21:19:27 +0200

@@ -1,0 +1,13 @@
+Source: demo-web-server
+Section: net
+Priority: optional
+Maintainer: Alexei Lozovsky <lozovsky@apriorit.com>
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.8
+Homepage: https://github.com/apriorit/demo-linux-web-server
+
+Package: demo-web-server
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: a simple web server
+ Demonstration package of a simple native executable.
